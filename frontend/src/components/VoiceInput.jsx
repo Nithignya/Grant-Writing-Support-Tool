@@ -12,7 +12,7 @@ function VoiceInput({ onTranscription }) {
       const formData = new FormData();
       formData.append("file", recordedBlob.blob, "voice-note.wav");
 
-      const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+      const API_URL = "https://grant-writing-backend.onrender.com";
       const response = await fetch(`${API_URL}/grant_writer/form/`, {
         method: "POST",
         body: formData,
