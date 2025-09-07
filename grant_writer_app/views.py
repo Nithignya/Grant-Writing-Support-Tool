@@ -1,9 +1,11 @@
 from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from transformers import pipeline
 import json
 import requests
+import logging
 
 from django.http import HttpResponse
 import sentry_sdk
@@ -24,27 +26,46 @@ def generate_response(request):
         try:
             # Parse input data
             data = json.loads(request.body)
-            prompt = data.get("prompt", "").strip()
+            print("👉 Payload from React:", data)  # Debug log
 
-            # Validate prompt
-            if not prompt:
-                return JsonResponse({"error": "No prompt provided"}, status=400)
+            # Collect fields from frontend
+            grant_title = data.get("grant_title", "")
+            objective = data.get("objective", "")
+            audience = data.get("audience", "")
+            funding = data.get("funding", "")
+            details = data.get("details", "")
+            transcription = data.get("transcription", "")
+
+            # Build prompt string
+            prompt = f"""
+            Grant Title: {grant_title}
+            Objective: {objective}
+            Audience: {audience}
+            Funding: {funding}
+            Details: {details}
+            Extra Notes: {transcription}
+            """.strip()
+
+            # Validate
+            if not any([grant_title, objective, audience, funding, details, transcription]):
+                return JsonResponse({"error": "No input provided"}, status=400)
 
             # Check if model pipeline is available
             if model_pipeline:
-                # Generate response using the pipeline
                 response = model_pipeline(prompt, max_length=200, do_sample=True)
                 generated_text = response[0].get("generated_text", "")
                 return JsonResponse({"response": generated_text}, status=200)
             else:
-                return JsonResponse({"error": "Model pipeline is not available"}, status=500)
-        
+                # For now, just return mock text (since torch not installed)
+                return JsonResponse({"response": f"✅ Backend received data and built prompt:\n{prompt}"}, status=200)
+
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON format"}, status=400)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Only POST method is allowed"}, status=405)
+
 
 # Dummy form view (to handle requests for testing)
 def grant_proposal_form(request):

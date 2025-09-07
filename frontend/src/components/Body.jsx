@@ -13,8 +13,8 @@ function Body() {
     setAiOutput(""); // Clear previous AI output
 
     try {
-      
-      const response = await fetch("https://grant-writing-support-tool-1.onrender.com/api/grant", {
+        const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+        const response = await fetch(`${API_URL}/grant_writer/generate/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...data, transcription }),
