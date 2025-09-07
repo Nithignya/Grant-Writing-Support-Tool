@@ -3,6 +3,7 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from transformers import pipeline
+import os
 import json
 import requests
 import logging
@@ -78,7 +79,7 @@ def grant_writer_ui(request):
         prompt = request.POST.get("prompt", "").strip()
         if prompt:
             # Interact with the model's API endpoint
-            api_url = "http://127.0.0.1:8000/grant_writer/generate/"
+            api_url = os.environ.get("BACKEND_URL", "http://127.0.0.1:8000/grant_writer/generate/")
             headers = {"Content-Type": "application/json"}
             payload = {"prompt": prompt}
             try:
