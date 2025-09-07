@@ -93,3 +93,5 @@ CORS_ALLOW_ALL_ORIGINS = True
 #     "http://localhost:3000",   # React dev server
 #     "https://<your-frontend>.onrender.com",  # Render frontend URL
 # ]
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
